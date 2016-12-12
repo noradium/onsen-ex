@@ -1,0 +1,22 @@
+#movieWrap .infoWrap .programInfo .infoText .favButton {
+    margin-bottom: 10px;
+}
+
+#movieWrap .infoWrap .programInfo .infoText .favButton button {
+    border: 0;
+    background-color: white;
+    border-radius: 15px;
+    color: rgb(40, 170, 50);
+    font-weight: bold;
+    cursor: pointer;
+    outline: none;
+}
+
+#movieWrap .infoWrap .programInfo .infoText .favButton button:hover {
+    background-color: rgb(12, 206, 30);
+    color: white;
+}
+
+#movieList .listWrap ul li {
+    margin: 0 12px 14px 0;
+}

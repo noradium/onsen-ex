@@ -1,0 +1,11 @@
+{
+  "name": "onsen-ex",
+  "version": "0.0.1",
+  "description": "onsen.ag's chrome extention",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "noradium",
+  "license": "ISC"
+}
