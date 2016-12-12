@@ -3,6 +3,9 @@
    * define functions
    *******************/
 
+  /**
+   * お気に入りボタンの初期化をします
+   */
   function initFavButton() {
     var infoTextElement = document.querySelector('#movieWrap .infoWrap .programInfo .infoText');
 
@@ -33,6 +36,10 @@
     infoTextElement.insertBefore(buttonBlock, infoTextElement.querySelector('.parsonarity'));
   }
 
+  /**
+   * 現在再生中の番組情報のDOMを取得します。（リストに表示されるカードみたいなやつ）
+   * @returns {Node}
+   */
   function findPlayingCard() {
     var list = Array.from(document.querySelectorAll('#movieList .listWrap ul.clr li'));
     return list.find(function (el) {
@@ -40,13 +47,18 @@
     });
   }
 
+  /**
+   * お気に入りタブの初期化をします
+   */
   function createFavTab() {
     var categoryList = document.querySelector('#movieNav .categoryList');
     var favTab = document.createElement('ul');
     favTab.classList.add('favorite');
     favTab.innerHTML = '<li>お気に入り</li>';
 
+    // お気に入りタブをクリックしたときにやること
     favTab.addEventListener('click', function () {
+      // 前に選択中のタブによっては、全ての番組が表示されていないことがあるので、`ALL`をクリックして全て表示させておく
       categoryList.querySelector('.btnSort.all').click();
 
       categoryList.querySelector('.select').classList.remove('select');
@@ -63,6 +75,7 @@
       });
     });
 
+    // お気に入りタブ以外をクリックしたときにやること
     categoryList.querySelectorAll('ul:not(.favorite)').forEach(function (el) {
       el.addEventListener('click', function () {
         favTab.querySelector('li').classList.remove('select');
@@ -81,12 +94,10 @@
 
   function restoreFavorites() {
     favorites = JSON.parse(localStorage.getItem(localStorageKey)) || [];
-    console.log('onsen-ex: restored', favorites);
   }
 
   function saveFavorites() {
     localStorage.setItem(localStorageKey, JSON.stringify(favorites));
-    console.log('onsen-ex: saved', favorites);
   }
 
   function addFavorite(id) {
