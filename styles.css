@@ -20,3 +20,8 @@
 #movieList .listWrap ul li {
     margin: 0 12px 14px 0;
 }
+
+#movieWrap .infoWrap .programInfo .officialLink {
+    top: initial !important;
+    bottom: -28px;
+}
