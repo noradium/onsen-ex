@@ -121,6 +121,12 @@
   /**********
    * process
    **********/
+  // localStorage が使えること前提の機能なので、チェックして使えなければ初期化しない
+  if(!('localStorage' in window) || (window.localStorage === null)) {
+    console.warn('onsen-ex: localStorage が利用不可のため初期化できませんでした。');
+    return;
+  }
+
   restoreFavorites();
 
   var infoWrapElement = document.querySelector('#movieWrap .infoWrap');
