@@ -48,6 +48,15 @@
   }
 
   /**
+   * id から番組情報のDOMを取得します。
+   * @param {string} id
+   * @returns {Element}
+   */
+  function findCardById(id) {
+    return document.querySelector('#movieList .listWrap ul li#' + id);
+  }
+
+  /**
    * お気に入りタブの初期化をします
    */
   function createFavTab() {
@@ -58,19 +67,16 @@
 
     // お気に入りタブをクリックしたときにやること
     favTab.addEventListener('click', function () {
-      // 前に選択中のタブによっては、全ての番組が表示されていないことがあるので、`ALL`をクリックして全て表示させておく
-      categoryList.querySelector('.btnSort.all').click();
-
       categoryList.querySelector('.select').classList.remove('select');
       favTab.querySelector('li').classList.add('select');
 
-      var list = Array.from(document.querySelectorAll('#movieList .listWrap ul.clr li'));
+      var list = document.querySelectorAll('#movieList .listWrap ul li');
       list.forEach(function (el) {
         var id = el.getAttribute('id');
         if (isFavorited(id)) {
-          el.classList.add('active');
+          showCard(el);
         } else {
-          el.classList.remove('active');
+          hideCard(el);
         }
       });
     });
@@ -85,6 +91,16 @@
     categoryList.appendChild(favTab);
   }
 
+  function showCard(cardElement) {
+    cardElement.style.opacity = 1;
+    cardElement.classList.add('active');
+  }
+
+  function hideCard(cardElement) {
+    cardElement.style.opacity = 0;
+    cardElement.classList.remove('active');
+  }
+
   /***********
    * favorite
    ***********/
@@ -94,6 +110,9 @@
 
   function restoreFavorites() {
     favorites = JSON.parse(localStorage.getItem(localStorageKey)) || [];
+    favorites = favorites.filter(function (id) {
+      return !!findCardById(id);
+    });
   }
 
   function saveFavorites() {
