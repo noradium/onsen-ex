@@ -104,19 +104,17 @@
   /***********
    * favorite
    ***********/
-
   var favorites = [];
-  var localStorageKey = 'onsen-ex_favorites';
 
   function restoreFavorites() {
-    favorites = JSON.parse(localStorage.getItem(localStorageKey)) || [];
+    favorites = load('favorites') || [];
     favorites = favorites.filter(function (id) {
       return !!findCardById(id);
     });
   }
 
   function saveFavorites() {
-    localStorage.setItem(localStorageKey, JSON.stringify(favorites));
+    save('favorites', favorites);
   }
 
   function addFavorite(id) {
@@ -135,6 +133,18 @@
 
   function isFavorited(id) {
     return favorites.includes(id);
+  }
+
+  /********
+   * infra
+   ********/
+  var keyPrefix = 'onsen-ex_';
+  function save(key, json) {
+    localStorage.setItem(keyPrefix + key, JSON.stringify(json));
+  }
+
+  function load(key) {
+    return JSON.parse(localStorage.getItem(keyPrefix + key));
   }
 
   /**********
