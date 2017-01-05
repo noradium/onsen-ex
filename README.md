@@ -8,3 +8,9 @@ localStorage にお気に入り情報を保存します。
 
 #install
 [Chrome ウェブストア](https://chrome.google.com/webstore/detail/onsen-ex/hdjhpekfkgdgbngpidplkncmgddijaml?hl=ja&gl=JP)
+
+# build
+```
+$npm install
+$npm run build
+```

@@ -8,10 +8,10 @@
         "http://www.onsen.ag/*"
       ],
       "css": [
-        "styles.css"
+        "styles/index.css"
       ],
       "js": [
-        "index.js"
+        "scripts/dist/onsen-ex.js"
       ]
     }
   ]
