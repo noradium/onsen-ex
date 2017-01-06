@@ -1,46 +1,48 @@
+import $ from 'jquery';
 
 export default class ItemListView {
   /**
    * @type {Player}
    */
   _player;
-  /**
-   * @type {NodeList}
-   */
-  _itemElements;
 
   constructor({player, favorite}) {
     this._player = player;
     this._favorite = favorite;
-    this._itemElements = document.querySelector('#movieList .listWrap ul').childNodes;
   }
 
   showOnly(ids) {
-    this._itemElements.forEach((el) => {
-      const id = el.getAttribute('id');
+    this._$itemList.each((index, item) => {
+      const $item = $(item);
+      const id = $item.attr('id');
       if (ids.includes(id)) {
-        this._showItem(el);
+        this._showItem($item);
       } else {
-        this._hideItem(el);
+        this._hideItem($item);
       }
     });
   }
 
-  _showItem(itemElement) {
-    itemElement.style.opacity = 1;
-    itemElement.classList.add('active');
+  get _$itemList() {
+    return $('#movieList').find('.listWrap ul li');
   }
 
-  _hideItem(itemElement) {
-    itemElement.style.opacity = 0;
-    itemElement.classList.remove('active');
+  _showItem($item) {
+    $item.css({opacity: 1});
+    $item.addClass('active');
+  }
+
+  _hideItem($item) {
+    $item.css({opacity: 0});
+    $item.removeClass('active');
   }
 
   find(className) {
-    return Array.from(this._itemElements)
-      .filter((el) => {
-        return el.classList.contains(className);
+    return this._$itemList.filter((index, item) => {
+        return $(item).hasClass(className);
       })
-      .map((el) => el.getAttribute('id'));
+      .map((index, item) => {
+        return $(item).attr('id');
+      });
   }
 }

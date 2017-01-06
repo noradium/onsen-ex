@@ -1,8 +1,9 @@
 import {EventEmitter} from 'events';
+import $ from 'jquery';
 
 export default class CategoryListView extends EventEmitter {
-  _categoryListElement;
-  _favTabElement;
+  _$categoryListElement;
+  _$favTabElement;
 
   constructor() {
     super();
@@ -10,27 +11,30 @@ export default class CategoryListView extends EventEmitter {
   }
 
   _init() {
-    this._categoryListElement = document.querySelector('#movieNav .categoryList');
-    this._favTabElement = document.createElement('ul');
-    this._favTabElement.classList.add('favorite');
-    this._favTabElement.innerHTML = '<li>お気に入り</li>';
+    this._$categoryListElement = $('#movieNav').find('.categoryList');
+    this._$favTabElement = $('<ul/>')
+      .addClass('favorite')
+      .append(
+        $('<li/>')
+          .text('お気に入り')
+      );
 
     // お気に入りタブをクリックしたときにやること
-    this._favTabElement.addEventListener('click', () => {
-      this._categoryListElement.querySelector('.select').classList.remove('select');
-      this._favTabElement.querySelector('li').classList.add('select');
+    this._$favTabElement.click(() => {
+      this._$categoryListElement.find('.select').removeClass('select');
+      this._$favTabElement.find('li').addClass('select');
       this.emit('click', {
         target: 'favorite'
       });
     });
 
     // お気に入りタブ以外をクリックしたときにやること
-    this._categoryListElement.querySelectorAll('ul:not(.favorite)').forEach((el) => {
-      el.addEventListener('click', () => {
-        this._favTabElement.querySelector('li').classList.remove('select');
+    this._$categoryListElement.find('ul:not(.favorite)').each((index, el) => {
+      $(el).click(() => {
+        this._$favTabElement.find('li').removeClass('select');
       });
     });
 
-    this._categoryListElement.appendChild(this._favTabElement);
+    this._$categoryListElement.append(this._$favTabElement);
   }
 }

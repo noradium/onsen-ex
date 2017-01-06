@@ -16,5 +16,8 @@
     "babel-plugin-transform-class-properties": "^6.19.0",
     "babel-preset-env": "^1.1.4",
     "webpack": "^1.14.0"
+  },
+  "dependencies": {
+    "jquery": "^3.1.1"
   }
 }

@@ -1,4 +1,5 @@
 import {EventEmitter} from 'events';
+import $ from 'jquery';
 
 export default class InfoTextView extends EventEmitter {
   /**
@@ -9,8 +10,8 @@ export default class InfoTextView extends EventEmitter {
    * @type {Favorite}
    */
   _favorite;
-  _infoTextElement;
-  _buttonElement;
+  _$infoTextElement;
+  _$button;
 
   constructor({player, favorite}) {
     super();
@@ -31,25 +32,24 @@ export default class InfoTextView extends EventEmitter {
   }
 
   _init() {
-    this._infoTextElement = document.querySelector('#movieWrap .infoWrap .programInfo .infoText');
+    this._$infoTextElement = $('#movieWrap').find('.infoWrap .programInfo .infoText');
 
     // 要素自体ないときは何もしない
-    if (!this._infoTextElement) {
+    if (this._$infoTextElement.length === 0) {
       return;
     }
 
     this.emit('update');
 
-    const buttonBlock = document.createElement('div');
-    buttonBlock.classList.add('favButton');
-    this._buttonElement = document.createElement('button');
+    this._$button = $('<button/>')
+      .click(this._boundOnFavButtonClick);
+
+    $('<div/>')
+      .addClass('favButton')
+      .append(this._$button)
+      .insertBefore(this._$infoTextElement.find('.parsonarity'));
 
     this._updateFavorited(this._favorite.includes(this._player.currentPlayingId));
-
-    this._buttonElement.addEventListener('click', this._boundOnFavButtonClick);
-
-    buttonBlock.appendChild(this._buttonElement);
-    this._infoTextElement.insertBefore(buttonBlock, this._infoTextElement.querySelector('.parsonarity'));
   }
 
   _onFavButtonClick() {
@@ -69,9 +69,9 @@ export default class InfoTextView extends EventEmitter {
 
   _updateFavorited(isFavorited) {
     if (isFavorited) {
-      this._buttonElement.innerText = '★お気に入り登録済';
+      this._$button.text('★お気に入り登録済');
     } else {
-      this._buttonElement.innerText = '☆お気に入り登録';
+      this._$button.text('☆お気に入り登録');
     }
   }
 }
