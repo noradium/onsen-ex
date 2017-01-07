@@ -1,19 +1,13 @@
-import LocalStorage from './storage/LocalStorage';
 import Favorite from './model/Favorite';
 import Player from './model/Player';
 import InfoTextView from './view/InfoTextView';
 import CategoryListView from './view/CategoryListView';
 import ItemListView from './view/ItemListView';
 
-(() => {
-  // localStorage が使えること前提の機能なので、チェックして使えなければ初期化しない
-  if (!LocalStorage.isAvailable) {
-    console.warn('onsen-ex: localStorage が利用不可のため初期化できませんでした。');
-    return;
-  }
+const favorite = new Favorite();
+const player = new Player();
 
-  const favorite = new Favorite();
-  const player = new Player();
+favorite.load().then(() => {
   const infoTextView = new InfoTextView({player, favorite});
   const categoryListView = new CategoryListView();
   const itemListView = new ItemListView({player, favorite});
@@ -30,4 +24,4 @@ import ItemListView from './view/ItemListView';
   infoTextView.on('update', () => {
     player.currentPlayingId = itemListView.find('playing')[0];
   });
-})();
+});

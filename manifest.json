@@ -14,5 +14,8 @@
         "scripts/dist/onsen-ex.js"
       ]
     }
+  ],
+  "permissions": [
+    "storage"
   ]
 }

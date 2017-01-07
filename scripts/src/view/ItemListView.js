@@ -96,6 +96,11 @@ export default class ItemListView {
       const $item = $(item);
       const id = $item.attr('id');
       if (id === targetId) {
+        if (isFavorited) {
+          $item.find('.fav').addClass('isFavorited');
+        } else {
+          $item.find('.fav').removeClass('isFavorited');
+        }
         $item.find('.fav .favButton').text(this._getFavoriteButtonText(isFavorited));
         return false; // break each
       }

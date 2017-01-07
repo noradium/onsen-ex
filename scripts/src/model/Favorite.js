@@ -1,4 +1,4 @@
-import Storage from '../storage/LocalStorage';
+import Storage from '../storage/ChromeStorage';
 import {EventEmitter} from 'events';
 
 export default class Favorite extends EventEmitter {
@@ -7,11 +7,12 @@ export default class Favorite extends EventEmitter {
 
   constructor() {
     super();
-    this._load();
   }
 
-  _load() {
-    this._favorites = Storage.get(Favorite.KEY) || [];
+  load() {
+    return Storage.get(Favorite.KEY).then((favorites) => {
+      this._favorites = favorites || [];
+    });
   }
 
   _save() {

@@ -46,10 +46,6 @@
 
 	'use strict';
 
-	var _LocalStorage = __webpack_require__(1);
-
-	var _LocalStorage2 = _interopRequireDefault(_LocalStorage);
-
 	var _Favorite = __webpack_require__(2);
 
 	var _Favorite2 = _interopRequireDefault(_Favorite);
@@ -72,15 +68,10 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	(() => {
-	  // localStorage が使えること前提の機能なので、チェックして使えなければ初期化しない
-	  if (!_LocalStorage2.default.isAvailable) {
-	    console.warn('onsen-ex: localStorage が利用不可のため初期化できませんでした。');
-	    return;
-	  }
+	const favorite = new _Favorite2.default();
+	const player = new _Player2.default();
 
-	  const favorite = new _Favorite2.default();
-	  const player = new _Player2.default();
+	favorite.load().then(() => {
 	  const infoTextView = new _InfoTextView2.default({ player, favorite });
 	  const categoryListView = new _CategoryListView2.default();
 	  const itemListView = new _ItemListView2.default({ player, favorite });
@@ -97,33 +88,10 @@
 	  infoTextView.on('update', () => {
 	    player.currentPlayingId = itemListView.find('playing')[0];
 	  });
-	})();
+	});
 
 /***/ },
-/* 1 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	exports.__esModule = true;
-	class LocalStorage {
-
-	  static get isAvailable() {
-	    return 'localStorage' in window && window.localStorage !== null;
-	  }
-
-	  static set(key, value) {
-	    localStorage.setItem(LocalStorage.KEY_PREFIX + key, JSON.stringify(value));
-	  }
-
-	  static get(key) {
-	    return JSON.parse(localStorage.getItem(LocalStorage.KEY_PREFIX + key));
-	  }
-	}
-	exports.default = LocalStorage;
-	LocalStorage.KEY_PREFIX = 'onsen-ex_';
-
-/***/ },
+/* 1 */,
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -131,9 +99,9 @@
 
 	exports.__esModule = true;
 
-	var _LocalStorage = __webpack_require__(1);
+	var _ChromeStorage = __webpack_require__(9);
 
-	var _LocalStorage2 = _interopRequireDefault(_LocalStorage);
+	var _ChromeStorage2 = _interopRequireDefault(_ChromeStorage);
 
 	var _events = __webpack_require__(3);
 
@@ -143,15 +111,16 @@
 
 	  constructor() {
 	    super();
-	    this._load();
 	  }
 
-	  _load() {
-	    this._favorites = _LocalStorage2.default.get(Favorite.KEY) || [];
+	  load() {
+	    return _ChromeStorage2.default.get(Favorite.KEY).then(favorites => {
+	      this._favorites = favorites || [];
+	    });
 	  }
 
 	  _save() {
-	    _LocalStorage2.default.set(Favorite.KEY, this._favorites);
+	    _ChromeStorage2.default.set(Favorite.KEY, this._favorites);
 	  }
 
 	  add(id) {
@@ -10988,6 +10957,11 @@
 	      const $item = (0, _jquery2.default)(item);
 	      const id = $item.attr('id');
 	      if (id === targetId) {
+	        if (isFavorited) {
+	          $item.find('.fav').addClass('isFavorited');
+	        } else {
+	          $item.find('.fav').removeClass('isFavorited');
+	        }
 	        $item.find('.fav .favButton').text(this._getFavoriteButtonText(isFavorited));
 	        return false; // break each
 	      }
@@ -10999,6 +10973,36 @@
 	  }
 	}
 	exports.default = ItemListView;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	class ChromeStorage {
+
+	  static set(key, value) {
+	    return new Promise((resolve, reject) => {
+	      chrome.storage.sync.set({
+	        [ChromeStorage.KEY_PREFIX + key]: value
+	      }, () => {
+	        resolve();
+	      });
+	    });
+	  }
+
+	  static get(key) {
+	    return new Promise((resolve, reject) => {
+	      chrome.storage.sync.get(ChromeStorage.KEY_PREFIX + key, items => {
+	        resolve(items[ChromeStorage.KEY_PREFIX + key]);
+	      });
+	    });
+	  }
+	}
+	exports.default = ChromeStorage;
+	ChromeStorage.KEY_PREFIX = 'onsen-ex_';
 
 /***/ }
 /******/ ]);
