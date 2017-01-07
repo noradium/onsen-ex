@@ -62,11 +62,11 @@
 
 	var _InfoTextView2 = _interopRequireDefault(_InfoTextView);
 
-	var _CategoryListView = __webpack_require__(6);
+	var _CategoryListView = __webpack_require__(7);
 
 	var _CategoryListView2 = _interopRequireDefault(_CategoryListView);
 
-	var _ItemListView = __webpack_require__(7);
+	var _ItemListView = __webpack_require__(8);
 
 	var _ItemListView2 = _interopRequireDefault(_ItemListView);
 
@@ -148,7 +148,6 @@
 
 	  _load() {
 	    this._favorites = _LocalStorage2.default.get(Favorite.KEY) || [];
-	    this.emit('update');
 	  }
 
 	  _save() {
@@ -157,7 +156,10 @@
 
 	  add(id) {
 	    this._favorites.push(id);
-	    this.emit('update');
+	    this.emit('update', {
+	      id: id,
+	      isFavorited: true
+	    });
 	    this._save();
 	  }
 
@@ -167,7 +169,10 @@
 	        this._favorites.splice(i, 1);
 	      }
 	    });
-	    this.emit('update');
+	    this.emit('update', {
+	      id: id,
+	      isFavorited: false
+	    });
 	    this._save();
 	  }
 
@@ -528,7 +533,7 @@
 
 	var _events = __webpack_require__(3);
 
-	var _jquery = __webpack_require__(8);
+	var _jquery = __webpack_require__(6);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -593,6 +598,10 @@
 	  }
 
 	  _updateFavorited(isFavorited) {
+	    if (!this._$button) {
+	      return;
+	    }
+
 	    if (isFavorited) {
 	      this._$button.text('★お気に入り登録済');
 	    } else {
@@ -604,115 +613,6 @@
 
 /***/ },
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	exports.__esModule = true;
-
-	var _events = __webpack_require__(3);
-
-	var _jquery = __webpack_require__(8);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	class CategoryListView extends _events.EventEmitter {
-
-	  constructor() {
-	    super();
-	    this._init();
-	  }
-
-	  _init() {
-	    this._$categoryListElement = (0, _jquery2.default)('#movieNav').find('.categoryList');
-	    this._$favTabElement = (0, _jquery2.default)('<ul/>').addClass('favorite').append((0, _jquery2.default)('<li/>').text('お気に入り'));
-
-	    // お気に入りタブをクリックしたときにやること
-	    this._$favTabElement.click(() => {
-	      this._$categoryListElement.find('.select').removeClass('select');
-	      this._$favTabElement.find('li').addClass('select');
-	      this.emit('click', {
-	        target: 'favorite'
-	      });
-	    });
-
-	    // お気に入りタブ以外をクリックしたときにやること
-	    this._$categoryListElement.find('ul:not(.favorite)').each((index, el) => {
-	      (0, _jquery2.default)(el).click(() => {
-	        this._$favTabElement.find('li').removeClass('select');
-	      });
-	    });
-
-	    this._$categoryListElement.append(this._$favTabElement);
-	  }
-	}
-	exports.default = CategoryListView;
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	exports.__esModule = true;
-
-	var _jquery = __webpack_require__(8);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	class ItemListView {
-
-	  constructor({ player, favorite }) {
-	    this._player = player;
-	    this._favorite = favorite;
-	  }
-	  /**
-	   * @type {Player}
-	   */
-
-
-	  showOnly(ids) {
-	    this._$itemList.each((index, item) => {
-	      const $item = (0, _jquery2.default)(item);
-	      const id = $item.attr('id');
-	      if (ids.includes(id)) {
-	        this._showItem($item);
-	      } else {
-	        this._hideItem($item);
-	      }
-	    });
-	  }
-
-	  get _$itemList() {
-	    return (0, _jquery2.default)('#movieList').find('.listWrap ul li');
-	  }
-
-	  _showItem($item) {
-	    $item.css({ opacity: 1 });
-	    $item.addClass('active');
-	  }
-
-	  _hideItem($item) {
-	    $item.css({ opacity: 0 });
-	    $item.removeClass('active');
-	  }
-
-	  find(className) {
-	    return this._$itemList.filter((index, item) => {
-	      return (0, _jquery2.default)(item).hasClass(className);
-	    }).map((index, item) => {
-	      return (0, _jquery2.default)(item).attr('id');
-	    });
-	  }
-	}
-	exports.default = ItemListView;
-
-/***/ },
-/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -10936,6 +10836,165 @@
 	return jQuery;
 	} );
 
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _events = __webpack_require__(3);
+
+	var _jquery = __webpack_require__(6);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	class CategoryListView extends _events.EventEmitter {
+
+	  constructor() {
+	    super();
+	    this._init();
+	  }
+
+	  _init() {
+	    this._$categoryListElement = (0, _jquery2.default)('#movieNav').find('.categoryList');
+	    this._$favTabElement = (0, _jquery2.default)('<ul/>').addClass('favorite').append((0, _jquery2.default)('<li/>').text('お気に入り'));
+
+	    // お気に入りタブをクリックしたときにやること
+	    this._$favTabElement.click(() => {
+	      this._$categoryListElement.find('.select').removeClass('select');
+	      this._$favTabElement.find('li').addClass('select');
+	      this.emit('click', {
+	        target: 'favorite'
+	      });
+	    });
+
+	    // お気に入りタブ以外をクリックしたときにやること
+	    this._$categoryListElement.find('ul:not(.favorite)').each((index, el) => {
+	      (0, _jquery2.default)(el).click(() => {
+	        this._$favTabElement.find('li').removeClass('select');
+	      });
+	    });
+
+	    this._$categoryListElement.append(this._$favTabElement);
+	  }
+	}
+	exports.default = CategoryListView;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _jquery = __webpack_require__(6);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	class ItemListView {
+
+	  constructor({ player, favorite }) {
+	    this._player = player;
+	    this._favorite = favorite;
+
+	    this._boundOnFavoriteUpdate = this._onFavoriteUpdate.bind(this);
+
+	    this._$itemList.each((index, item) => {
+	      const $item = (0, _jquery2.default)(item);
+	      const id = $item.attr('id');
+	      const isFavorited = this._favorite.includes(id);
+	      $item.append(this._createFavButton(isFavorited));
+	    });
+
+	    // 多分音泉側で document に useCapture=true のクリックハンドラが登録されているせいで、
+	    // 普通に登録すると反応してくれない。
+	    // なので document に登録して target を見る
+	    (0, _jquery2.default)(document).on('click', e => {
+	      // お気に入りボタン (p.favButton)
+	      if (e.target.classList.contains('favButton')) {
+	        const $favButton = (0, _jquery2.default)(e.target);
+	        const id = $favButton.parent().parent().attr('id');
+	        if (this._favorite.includes(id)) {
+	          this._favorite.remove(id);
+	        } else {
+	          this._favorite.add(id);
+	        }
+	      }
+	    });
+
+	    this._favorite.on('update', this._boundOnFavoriteUpdate);
+	  }
+	  /**
+	   * @type {Player}
+	   */
+
+
+	  showOnly(ids) {
+	    this._$itemList.each((index, item) => {
+	      const $item = (0, _jquery2.default)(item);
+	      const id = $item.attr('id');
+	      if (ids.includes(id)) {
+	        this._showItem($item);
+	      } else {
+	        this._hideItem($item);
+	      }
+	    });
+	  }
+
+	  find(className) {
+	    return this._$itemList.filter((index, item) => {
+	      return (0, _jquery2.default)(item).hasClass(className);
+	    }).map((index, item) => {
+	      return (0, _jquery2.default)(item).attr('id');
+	    });
+	  }
+
+	  get _$itemList() {
+	    return (0, _jquery2.default)('#movieList').find('.listWrap ul li');
+	  }
+
+	  _createFavButton(isFavorited) {
+	    return (0, _jquery2.default)('<div/>').addClass('listItem').addClass('fav').append((0, _jquery2.default)('<p/>').addClass('favButton').text(this._getFavoriteButtonText(isFavorited)));
+	  }
+
+	  _showItem($item) {
+	    $item.css({ opacity: 1 });
+	    $item.addClass('active');
+	  }
+
+	  _hideItem($item) {
+	    $item.css({ opacity: 0 });
+	    $item.removeClass('active');
+	  }
+
+	  _onFavoriteUpdate(data) {
+	    this._updateFavorited(data.id, data.isFavorited);
+	  }
+
+	  _updateFavorited(targetId, isFavorited) {
+	    this._$itemList.each((index, item) => {
+	      const $item = (0, _jquery2.default)(item);
+	      const id = $item.attr('id');
+	      if (id === targetId) {
+	        $item.find('.fav .favButton').text(this._getFavoriteButtonText(isFavorited));
+	        return false; // break each
+	      }
+	    });
+	  }
+
+	  _getFavoriteButtonText(isFavorited) {
+	    return isFavorited ? '★お気に入り登録済' : '☆お気に入り登録';
+	  }
+	}
+	exports.default = ItemListView;
 
 /***/ }
 /******/ ]);

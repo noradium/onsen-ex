@@ -68,6 +68,10 @@ export default class InfoTextView extends EventEmitter {
   }
 
   _updateFavorited(isFavorited) {
+    if (!this._$button) {
+      return;
+    }
+
     if (isFavorited) {
       this._$button.text('★お気に入り登録済');
     } else {
