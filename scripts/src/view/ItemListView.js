@@ -64,13 +64,17 @@ export default class ItemListView {
   }
 
   _createFavButton(isFavorited) {
-    return $('<div/>')
+    const button = $('<div/>')
       .addClass('listItem')
       .addClass('fav')
       .append($('<p/>')
         .addClass('favButton')
         .text(this._getFavoriteButtonText(isFavorited))
       );
+    if (isFavorited) {
+      button.addClass('isFavorited');
+    }
+    return button;
   }
 
   _showItem($item) {

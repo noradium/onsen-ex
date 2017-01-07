@@ -10962,7 +10962,11 @@
 	  }
 
 	  _createFavButton(isFavorited) {
-	    return (0, _jquery2.default)('<div/>').addClass('listItem').addClass('fav').append((0, _jquery2.default)('<p/>').addClass('favButton').text(this._getFavoriteButtonText(isFavorited)));
+	    const button = (0, _jquery2.default)('<div/>').addClass('listItem').addClass('fav').append((0, _jquery2.default)('<p/>').addClass('favButton').text(this._getFavoriteButtonText(isFavorited)));
+	    if (isFavorited) {
+	      button.addClass('isFavorited');
+	    }
+	    return button;
 	  }
 
 	  _showItem($item) {
