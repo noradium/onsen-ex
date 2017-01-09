@@ -1,20 +1,30 @@
-import Favorite from './model/Favorite';
+import FavoriteProgram from './model/FavoriteProgram';
+import FavoritePersonality from './model/FavoritePersonality';
 import Player from './model/Player';
 import InfoTextView from './view/InfoTextView';
 import CategoryListView from './view/CategoryListView';
 import ItemListView from './view/ItemListView';
 
-const favorite = new Favorite();
+const favoriteProgram = new FavoriteProgram();
+const favoritePersonality = new FavoritePersonality();
 const player = new Player();
 
-favorite.load().then(() => {
-  const infoTextView = new InfoTextView({player, favorite});
+Promise.all([
+  favoriteProgram.load(),
+  favoritePersonality.load()
+]).then(() => {
+  const infoTextView = new InfoTextView({player, favoriteProgram, favoritePersonality});
   const categoryListView = new CategoryListView();
-  const itemListView = new ItemListView({player, favorite});
+  const itemListView = new ItemListView({player, favoriteProgram});
 
   categoryListView.on('click', (data) => {
-    if (data.target === 'favorite') {
-      itemListView.showOnly(favorite.ids);
+    switch (data.target) {
+      case 'favoriteProgram':
+        itemListView.showOnly(favoriteProgram.ids);
+        break;
+      case 'favoritePersonality':
+        itemListView.showOnlyByPersonality(favoritePersonality.castNames);
+        break;
     }
   });
 

@@ -6,16 +6,16 @@ export default class ItemListView {
    */
   _player;
 
-  constructor({player, favorite}) {
+  constructor({player, favoriteProgram}) {
     this._player = player;
-    this._favorite = favorite;
+    this._favoriteProgram = favoriteProgram;
 
     this._boundOnFavoriteUpdate = this._onFavoriteUpdate.bind(this);
 
     this._$itemList.each((index, item) => {
       const $item = $(item);
       const id = $item.attr('id');
-      const isFavorited = this._favorite.includes(id);
+      const isFavorited = this._favoriteProgram.includes(id);
       $item.append(this._createFavButton(isFavorited));
     });
 
@@ -27,15 +27,15 @@ export default class ItemListView {
       if (e.target.classList.contains('favButton')) {
         const $favButton = $(e.target);
         const id = $favButton.parent().parent().attr('id');
-        if (this._favorite.includes(id)) {
-          this._favorite.remove(id);
+        if (this._favoriteProgram.includes(id)) {
+          this._favoriteProgram.remove(id);
         } else {
-          this._favorite.add(id);
+          this._favoriteProgram.add(id);
         }
       }
     });
 
-    this._favorite.on('update', this._boundOnFavoriteUpdate);
+    this._favoriteProgram.on('update', this._boundOnFavoriteUpdate);
   }
 
   showOnly(ids) {
@@ -43,6 +43,21 @@ export default class ItemListView {
       const $item = $(item);
       const id = $item.attr('id');
       if (ids.includes(id)) {
+        this._showItem($item);
+      } else {
+        this._hideItem($item);
+      }
+    });
+  }
+
+  showOnlyByPersonality(castNames) {
+    this._$itemList.each((index, item) => {
+      const $item = $(item);
+      const personalityText = $item.find('.navigator span').text();
+      const includesFavoritePersonality = castNames.some((castName) => {
+        return personalityText.indexOf(castName) !== -1;
+      });
+      if (includesFavoritePersonality) {
         this._showItem($item);
       } else {
         this._hideItem($item);

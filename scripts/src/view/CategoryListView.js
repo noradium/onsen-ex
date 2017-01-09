@@ -13,28 +13,51 @@ export default class CategoryListView extends EventEmitter {
   _init() {
     this._$categoryListElement = $('#movieNav').find('.categoryList');
     this._$favTabElement = $('<ul/>')
-      .addClass('favorite')
+      .addClass('favoriteProgram')
       .append(
         $('<li/>')
-          .text('お気に入り')
+          .text('お気に入り番組')
+      );
+    this._$personalityFavTabElement = $('<ul/>')
+      .addClass('favoritePersonality')
+      .append(
+        $('<li/>')
+          .text('お気に入り声優')
       );
 
-    // お気に入りタブをクリックしたときにやること
-    this._$favTabElement.click(() => {
+    // お気に入り番組タブをクリックしたときにやること
+    this._$favTabElement.on('click', () => {
       this._$categoryListElement.find('.select').removeClass('select');
       this._$favTabElement.find('li').addClass('select');
       this.emit('click', {
-        target: 'favorite'
+        target: 'favoriteProgram'
       });
     });
 
-    // お気に入りタブ以外をクリックしたときにやること
-    this._$categoryListElement.find('ul:not(.favorite)').each((index, el) => {
+    // お気に入り声優タブをクリックしたときにやること
+    this._$personalityFavTabElement.on('click', () => {
+      this._$categoryListElement.find('.select').removeClass('select');
+      this._$personalityFavTabElement.find('li').addClass('select');
+      this.emit('click', {
+        target: 'favoritePersonality'
+      });
+    });
+
+    // お気に入り番組タブ以外をクリックしたときにやること
+    this._$categoryListElement.find('ul:not(.favoriteProgram)').each((index, el) => {
       $(el).click(() => {
         this._$favTabElement.find('li').removeClass('select');
       });
     });
 
+    // お気に入り声優タブ以外をクリックしたときにやること
+    this._$categoryListElement.find('ul:not(.favoritePersonality)').each((index, el) => {
+      $(el).click(() => {
+        this._$personalityFavTabElement.find('li').removeClass('select');
+      });
+    });
+
     this._$categoryListElement.append(this._$favTabElement);
+    this._$categoryListElement.append(this._$personalityFavTabElement);
   }
 }

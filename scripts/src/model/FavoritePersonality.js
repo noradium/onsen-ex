@@ -1,8 +1,8 @@
 import Storage from '../storage/ChromeStorage';
 import {EventEmitter} from 'events';
 
-export default class Favorite extends EventEmitter {
-  static KEY = 'favorites';
+export default class FavoritePersonality extends EventEmitter {
+  static KEY = 'favoritePersonality';
   _favorites;
 
   constructor() {
@@ -10,42 +10,42 @@ export default class Favorite extends EventEmitter {
   }
 
   load() {
-    return Storage.get(Favorite.KEY).then((favorites) => {
+    return Storage.get(FavoritePersonality.KEY).then((favorites) => {
       this._favorites = favorites || [];
     });
   }
 
   _save() {
-    Storage.set(Favorite.KEY, this._favorites);
+    Storage.set(FavoritePersonality.KEY, this._favorites);
   }
 
-  add(id) {
-    this._favorites.push(id);
+  add(castName) {
+    this._favorites.push(castName);
     this.emit('update', {
-      id: id,
+      castName: castName,
       isFavorited: true
     });
     this._save();
   }
 
-  remove(id) {
+  remove(castName) {
     this._favorites.some((v, i) => {
-      if (v == id) {
+      if (v == castName) {
         this._favorites.splice(i, 1);
       }
     });
     this.emit('update', {
-      id: id,
+      castName: castName,
       isFavorited: false
     });
     this._save();
   }
 
-  get ids() {
+  get castNames() {
     return this._favorites;
   }
 
-  includes(id) {
-    return this._favorites.includes(id);
+  includes(castName) {
+    return this._favorites.includes(castName);
   }
 }
