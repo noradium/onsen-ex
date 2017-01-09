@@ -15,7 +15,7 @@ Promise.all([
 ]).then(() => {
   const infoTextView = new InfoTextView({player, favoriteProgram, favoritePersonality});
   const categoryListView = new CategoryListView();
-  const itemListView = new ItemListView({player, favoriteProgram});
+  const itemListView = new ItemListView({player, favoriteProgram, favoritePersonality});
 
   categoryListView.on('click', (data) => {
     switch (data.target) {
