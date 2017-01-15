@@ -1,6 +1,6 @@
 {
   "name": "onsen-ex",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "onsen.ag's chrome extention",
   "main": "index.js",
   "scripts": {

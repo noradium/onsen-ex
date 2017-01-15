@@ -11,6 +11,8 @@ chrome.storage.sync にお気に入り情報を保存するので、アカウン
   * 番組再生中に右に表示される番組情報の中のパーソナリティから声優をお気に入り登録できる機能追加
   * 番組一覧にお気に入りボタン追加(リスト表示には対応してません)
   * 左のカテゴリ欄にお気に入り声優タブを追加
+* 視聴済み表示
+  * 一度でも再生した番組は「視聴済」ラベルを表示
   
 #install
 [Chrome ウェブストア](https://chrome.google.com/webstore/detail/onsen-ex/hdjhpekfkgdgbngpidplkncmgddijaml?hl=ja&gl=JP)
