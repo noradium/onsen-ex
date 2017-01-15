@@ -58,15 +58,19 @@
 
 	var _Player2 = _interopRequireDefault(_Player);
 
-	var _InfoTextView = __webpack_require__(6);
+	var _ListenHistory = __webpack_require__(6);
+
+	var _ListenHistory2 = _interopRequireDefault(_ListenHistory);
+
+	var _InfoTextView = __webpack_require__(7);
 
 	var _InfoTextView2 = _interopRequireDefault(_InfoTextView);
 
-	var _CategoryListView = __webpack_require__(9);
+	var _CategoryListView = __webpack_require__(11);
 
 	var _CategoryListView2 = _interopRequireDefault(_CategoryListView);
 
-	var _ItemListView = __webpack_require__(10);
+	var _ItemListView = __webpack_require__(12);
 
 	var _ItemListView2 = _interopRequireDefault(_ItemListView);
 
@@ -75,11 +79,12 @@
 	const favoriteProgram = new _FavoriteProgram2.default();
 	const favoritePersonality = new _FavoritePersonality2.default();
 	const player = new _Player2.default();
+	const listenHistory = new _ListenHistory2.default();
 
-	Promise.all([favoriteProgram.load(), favoritePersonality.load()]).then(() => {
+	Promise.all([favoriteProgram.load(), favoritePersonality.load(), listenHistory.load()]).then(() => {
 	  const infoTextView = new _InfoTextView2.default({ player, favoriteProgram, favoritePersonality });
 	  const categoryListView = new _CategoryListView2.default();
-	  const itemListView = new _ItemListView2.default({ player, favoriteProgram, favoritePersonality });
+	  const itemListView = new _ItemListView2.default({ player, favoriteProgram, favoritePersonality, listenHistory });
 
 	  categoryListView.on('click', data => {
 	    switch (data.target) {
@@ -96,7 +101,9 @@
 	  // つまり再生中の番組が変わったということなので、
 	  // このタイミングで Player#currentPlayingId を更新します。
 	  infoTextView.on('update', () => {
-	    player.currentPlayingId = itemListView.find('playing')[0];
+	    const playing = itemListView.find('playing')[0];
+	    player.currentPlayingId = playing.id;
+	    listenHistory.update(playing.id, playing.update);
 	  });
 	});
 
@@ -604,17 +611,67 @@
 
 	exports.__esModule = true;
 
+	var _ChromeStorage = __webpack_require__(2);
+
+	var _ChromeStorage2 = _interopRequireDefault(_ChromeStorage);
+
 	var _events = __webpack_require__(3);
 
-	var _jquery = __webpack_require__(7);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	class ListenHistory extends _events.EventEmitter {
+
+	  load() {
+	    return _ChromeStorage2.default.get(ListenHistory.KEY).then(history => {
+	      this._history = history || {};
+	    });
+	  }
+
+	  _save() {
+	    _ChromeStorage2.default.set(ListenHistory.KEY, this._history);
+	  }
+
+	  update(id, updateDate) {
+	    this._history[id] = updateDate;
+	    this.emit('update', {
+	      id: id,
+	      updateDate: updateDate
+	    });
+	    this._save();
+	  }
+
+	  /**
+	   * 指定した番組の最後に視聴した回の更新日を返します。
+	   * 同じ番組の違う回が２個以上現れることはないこと前提の機能になっているのでひょっとすると修正が必要になるかもしれない
+	   * @param id
+	   * @returns {*}
+	   */
+	  lastListenDate(id) {
+	    return this._history[id];
+	  }
+	}
+	exports.default = ListenHistory;
+	ListenHistory.KEY = 'history';
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _events = __webpack_require__(3);
+
+	var _jquery = __webpack_require__(8);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _InfoTextProgramFavoriteView = __webpack_require__(8);
+	var _InfoTextProgramFavoriteView = __webpack_require__(9);
 
 	var _InfoTextProgramFavoriteView2 = _interopRequireDefault(_InfoTextProgramFavoriteView);
 
-	var _InfoTextPersonalityFavoriteView = __webpack_require__(11);
+	var _InfoTextPersonalityFavoriteView = __webpack_require__(10);
 
 	var _InfoTextPersonalityFavoriteView2 = _interopRequireDefault(_InfoTextPersonalityFavoriteView);
 
@@ -661,7 +718,7 @@
 	exports.default = InfoTextView;
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -10887,7 +10944,7 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -10896,7 +10953,7 @@
 
 	var _events = __webpack_require__(3);
 
-	var _jquery = __webpack_require__(7);
+	var _jquery = __webpack_require__(8);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -10966,72 +11023,6 @@
 	exports.default = InfoTextProgramFavoriteView;
 
 /***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	exports.__esModule = true;
-
-	var _events = __webpack_require__(3);
-
-	var _jquery = __webpack_require__(7);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	class CategoryListView extends _events.EventEmitter {
-
-	  constructor() {
-	    super();
-	    this._init();
-	  }
-
-	  _init() {
-	    this._$categoryListElement = (0, _jquery2.default)('#movieNav').find('.categoryList');
-	    this._$favTabElement = (0, _jquery2.default)('<ul/>').addClass('favoriteProgram').append((0, _jquery2.default)('<li/>').text('お気に入り番組'));
-	    this._$personalityFavTabElement = (0, _jquery2.default)('<ul/>').addClass('favoritePersonality').append((0, _jquery2.default)('<li/>').text('お気に入り声優'));
-
-	    // お気に入り番組タブをクリックしたときにやること
-	    this._$favTabElement.on('click', () => {
-	      this._$categoryListElement.find('.select').removeClass('select');
-	      this._$favTabElement.find('li').addClass('select');
-	      this.emit('click', {
-	        target: 'favoriteProgram'
-	      });
-	    });
-
-	    // お気に入り声優タブをクリックしたときにやること
-	    this._$personalityFavTabElement.on('click', () => {
-	      this._$categoryListElement.find('.select').removeClass('select');
-	      this._$personalityFavTabElement.find('li').addClass('select');
-	      this.emit('click', {
-	        target: 'favoritePersonality'
-	      });
-	    });
-
-	    // お気に入り番組タブ以外をクリックしたときにやること
-	    this._$categoryListElement.find('ul:not(.favoriteProgram)').each((index, el) => {
-	      (0, _jquery2.default)(el).click(() => {
-	        this._$favTabElement.find('li').removeClass('select');
-	      });
-	    });
-
-	    // お気に入り声優タブ以外をクリックしたときにやること
-	    this._$categoryListElement.find('ul:not(.favoritePersonality)').each((index, el) => {
-	      (0, _jquery2.default)(el).click(() => {
-	        this._$personalityFavTabElement.find('li').removeClass('select');
-	      });
-	    });
-
-	    this._$categoryListElement.append(this._$favTabElement);
-	    this._$categoryListElement.append(this._$personalityFavTabElement);
-	  }
-	}
-	exports.default = CategoryListView;
-
-/***/ },
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -11039,210 +11030,9 @@
 
 	exports.__esModule = true;
 
-	var _jquery = __webpack_require__(7);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	class ItemListView {
-
-	  constructor({ player, favoriteProgram, favoritePersonality }) {
-	    this._player = player;
-	    this._favoriteProgram = favoriteProgram;
-	    this._favoritePersonality = favoritePersonality;
-
-	    this._boundOnFavoriteUpdate = this._onFavoriteUpdate.bind(this);
-	    this._boundOnFavoritePersonalityUpdate = this._onFavoritePersonalityUpdate.bind(this);
-
-	    this._$itemList.each((index, item) => {
-	      const $item = (0, _jquery2.default)(item);
-	      const id = $item.attr('id');
-	      const isFavorited = this._favoriteProgram.includes(id);
-	      $item.append(this._createFavButton(isFavorited));
-
-	      const $personalityText = $item.find('.navigator span');
-	      const personalityText = $personalityText.text();
-	      const personalityList = this._parsePersonalityText(personalityText);
-
-	      $personalityText.text('');
-	      personalityList.forEach((personality, index) => {
-	        const isFavorited = this._favoritePersonality.includes(personality.castName);
-	        const $castName = (0, _jquery2.default)('<a/>').addClass('itemListCastName').text(personality.castName).attr('data-castname', personality.castName).attr('title', isFavorited ? 'お気に入りを解除する' : 'お気に入りに登録する').on('click', { castName: personality.castName }, this._boundOnCastNameClick);
-	        if (isFavorited) {
-	          $castName.addClass('isFavorited');
-	        }
-
-	        $personalityText.append($castName);
-	        if (index !== personalityList.length - 1) {
-	          $personalityText.append(' / ');
-	        }
-	      });
-	    });
-
-	    // 多分音泉側で document に useCapture=true のクリックハンドラが登録されているせいで、
-	    // 普通に登録すると反応してくれない。
-	    // なので document に登録して target を見る
-	    (0, _jquery2.default)(document).on('click', e => {
-	      if (e.target.classList.contains('itemListFavButton')) {
-	        // お気に入りボタン (p.itemListFavButton)
-	        const $favButton = (0, _jquery2.default)(e.target);
-	        const id = $favButton.parent().parent().attr('id');
-	        if (this._favoriteProgram.includes(id)) {
-	          this._favoriteProgram.remove(id);
-	        } else {
-	          this._favoriteProgram.add(id);
-	        }
-	      } else if (e.target.classList.contains('itemListCastName')) {
-	        // 声優名 (a.itemListCastName)
-	        const castName = (0, _jquery2.default)(e.target).data('castname');
-	        if (this._favoritePersonality.includes(castName)) {
-	          this._favoritePersonality.remove(castName);
-	        } else {
-	          this._favoritePersonality.add(castName);
-	        }
-	      }
-	    });
-
-	    this._favoriteProgram.on('update', this._boundOnFavoriteUpdate);
-	    this._favoritePersonality.on('update', this._boundOnFavoritePersonalityUpdate);
-	  }
-	  /**
-	   * @type {Player}
-	   */
-
-
-	  showOnly(ids) {
-	    this._$itemList.each((index, item) => {
-	      const $item = (0, _jquery2.default)(item);
-	      const id = $item.attr('id');
-	      if (ids.includes(id)) {
-	        this._showItem($item);
-	      } else {
-	        this._hideItem($item);
-	      }
-	    });
-	  }
-
-	  showOnlyByPersonality(castNames) {
-	    this._$itemList.each((index, item) => {
-	      const $item = (0, _jquery2.default)(item);
-	      const personalityText = $item.find('.navigator span').text();
-	      const includesFavoritePersonality = castNames.some(castName => {
-	        return personalityText.indexOf(castName) !== -1;
-	      });
-	      if (includesFavoritePersonality) {
-	        this._showItem($item);
-	      } else {
-	        this._hideItem($item);
-	      }
-	    });
-	  }
-
-	  find(className) {
-	    return this._$itemList.filter((index, item) => {
-	      return (0, _jquery2.default)(item).hasClass(className);
-	    }).map((index, item) => {
-	      return (0, _jquery2.default)(item).attr('id');
-	    });
-	  }
-
-	  get _$itemList() {
-	    return (0, _jquery2.default)('#movieList').find('.listWrap ul li');
-	  }
-
-	  /**
-	   * パーソナリティの中身の文字列をパースして object 化します。
-	   * personalityText の例 '長縄まりあ / 前川涼子'
-	   *
-	   * @param {string} text
-	   * @returns {object[]}
-	   * @private
-	   */
-	  _parsePersonalityText(text) {
-	    const separator = ' / ';
-	    return text.split(separator).map(castName => {
-	      return {
-	        castName: castName };
-	    });
-	  }
-
-	  _createFavButton(isFavorited) {
-	    const button = (0, _jquery2.default)('<div/>').addClass('listItem').addClass('fav').append((0, _jquery2.default)('<p/>').addClass('itemListFavButton').text(this._getFavoriteButtonText(isFavorited)));
-	    if (isFavorited) {
-	      button.addClass('isFavorited');
-	    }
-	    return button;
-	  }
-
-	  _showItem($item) {
-	    $item.css({ opacity: 1 });
-	    $item.addClass('active');
-	  }
-
-	  _hideItem($item) {
-	    $item.css({ opacity: 0 });
-	    $item.removeClass('active');
-	  }
-
-	  _onFavoriteUpdate(data) {
-	    this._updateFavorited(data.id, data.isFavorited);
-	  }
-
-	  _updateFavorited(targetId, isFavorited) {
-	    this._$itemList.each((index, item) => {
-	      const $item = (0, _jquery2.default)(item);
-	      const id = $item.attr('id');
-	      if (id === targetId) {
-	        if (isFavorited) {
-	          $item.find('.fav').addClass('isFavorited');
-	        } else {
-	          $item.find('.fav').removeClass('isFavorited');
-	        }
-	        $item.find('.fav .itemListFavButton').text(this._getFavoriteButtonText(isFavorited));
-	        return false; // break each
-	      }
-	    });
-	  }
-
-	  _getFavoriteButtonText(isFavorited) {
-	    return isFavorited ? '★お気に入り登録済' : '☆お気に入り登録';
-	  }
-
-	  _onFavoritePersonalityUpdate() {
-	    this._updatePersonalityFavorited();
-	  }
-
-	  _updatePersonalityFavorited() {
-	    this._$itemList.each((index, item) => {
-	      const $item = (0, _jquery2.default)(item);
-	      const $personalityText = $item.find('.navigator span');
-	      $personalityText.find('.itemListCastName').each((index, castNameElement) => {
-	        const $castName = (0, _jquery2.default)(castNameElement);
-	        const castName = $castName.data('castname');
-	        if (this._favoritePersonality.includes(castName)) {
-	          $castName.addClass('isFavorited').attr('title', 'お気に入りを解除する');
-	        } else {
-	          $castName.removeClass('isFavorited').attr('title', 'お気に入りに登録する');
-	        }
-	      });
-	    });
-	  }
-
-	}
-	exports.default = ItemListView;
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	exports.__esModule = true;
-
 	var _events = __webpack_require__(3);
 
-	var _jquery = __webpack_require__(7);
+	var _jquery = __webpack_require__(8);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -11347,6 +11137,304 @@
 	  }
 	}
 	exports.default = InfoTextProgramFavoriteView;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _events = __webpack_require__(3);
+
+	var _jquery = __webpack_require__(8);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	class CategoryListView extends _events.EventEmitter {
+
+	  constructor() {
+	    super();
+	    this._init();
+	  }
+
+	  _init() {
+	    this._$categoryListElement = (0, _jquery2.default)('#movieNav').find('.categoryList');
+	    this._$favTabElement = (0, _jquery2.default)('<ul/>').addClass('favoriteProgram').append((0, _jquery2.default)('<li/>').text('お気に入り番組'));
+	    this._$personalityFavTabElement = (0, _jquery2.default)('<ul/>').addClass('favoritePersonality').append((0, _jquery2.default)('<li/>').text('お気に入り声優'));
+
+	    // お気に入り番組タブをクリックしたときにやること
+	    this._$favTabElement.on('click', () => {
+	      this._$categoryListElement.find('.select').removeClass('select');
+	      this._$favTabElement.find('li').addClass('select');
+	      this.emit('click', {
+	        target: 'favoriteProgram'
+	      });
+	    });
+
+	    // お気に入り声優タブをクリックしたときにやること
+	    this._$personalityFavTabElement.on('click', () => {
+	      this._$categoryListElement.find('.select').removeClass('select');
+	      this._$personalityFavTabElement.find('li').addClass('select');
+	      this.emit('click', {
+	        target: 'favoritePersonality'
+	      });
+	    });
+
+	    // お気に入り番組タブ以外をクリックしたときにやること
+	    this._$categoryListElement.find('ul:not(.favoriteProgram)').each((index, el) => {
+	      (0, _jquery2.default)(el).click(() => {
+	        this._$favTabElement.find('li').removeClass('select');
+	      });
+	    });
+
+	    // お気に入り声優タブ以外をクリックしたときにやること
+	    this._$categoryListElement.find('ul:not(.favoritePersonality)').each((index, el) => {
+	      (0, _jquery2.default)(el).click(() => {
+	        this._$personalityFavTabElement.find('li').removeClass('select');
+	      });
+	    });
+
+	    this._$categoryListElement.append(this._$favTabElement);
+	    this._$categoryListElement.append(this._$personalityFavTabElement);
+	  }
+	}
+	exports.default = CategoryListView;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _jquery = __webpack_require__(8);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	class ItemListView {
+
+	  constructor({ player, favoriteProgram, favoritePersonality, listenHistory }) {
+	    this._player = player;
+	    this._favoriteProgram = favoriteProgram;
+	    this._favoritePersonality = favoritePersonality;
+	    this._listenHistory = listenHistory;
+
+	    this._boundOnFavoriteUpdate = this._onFavoriteUpdate.bind(this);
+	    this._boundOnFavoritePersonalityUpdate = this._onFavoritePersonalityUpdate.bind(this);
+	    this._boundOnListenHistoryUpdate = this._onListenHistoryUpdate.bind(this);
+
+	    this._$itemList.each((index, item) => {
+	      const $item = (0, _jquery2.default)(item);
+	      const id = $item.attr('id');
+	      const isFavorited = this._favoriteProgram.includes(id);
+	      $item.append(this._createFavButton(isFavorited));
+	      $item.append(this._createListenedLabel());
+
+	      const $personalityText = $item.find('.navigator span');
+	      const personalityText = $personalityText.text();
+	      const personalityList = this._parsePersonalityText(personalityText);
+
+	      $personalityText.text('');
+	      personalityList.forEach((personality, index) => {
+	        const isFavorited = this._favoritePersonality.includes(personality.castName);
+	        const $castName = (0, _jquery2.default)('<a/>').addClass('itemListCastName').text(personality.castName).attr('data-castname', personality.castName).attr('title', isFavorited ? 'お気に入りを解除する' : 'お気に入りに登録する').on('click', { castName: personality.castName }, this._boundOnCastNameClick);
+	        if (isFavorited) {
+	          $castName.addClass('isFavorited');
+	        }
+
+	        $personalityText.append($castName);
+	        if (index !== personalityList.length - 1) {
+	          $personalityText.append(' / ');
+	        }
+	      });
+	    });
+
+	    this._updateListened();
+
+	    // 多分音泉側で document に useCapture=true のクリックハンドラが登録されているせいで、
+	    // 普通に登録すると反応してくれない。
+	    // なので document に登録して target を見る
+	    (0, _jquery2.default)(document).on('click', e => {
+	      if (e.target.classList.contains('itemListFavButton')) {
+	        // お気に入りボタン (p.itemListFavButton)
+	        const $favButton = (0, _jquery2.default)(e.target);
+	        const id = $favButton.parent().parent().attr('id');
+	        if (this._favoriteProgram.includes(id)) {
+	          this._favoriteProgram.remove(id);
+	        } else {
+	          this._favoriteProgram.add(id);
+	        }
+	      } else if (e.target.classList.contains('itemListCastName')) {
+	        // 声優名 (a.itemListCastName)
+	        const castName = (0, _jquery2.default)(e.target).data('castname');
+	        if (this._favoritePersonality.includes(castName)) {
+	          this._favoritePersonality.remove(castName);
+	        } else {
+	          this._favoritePersonality.add(castName);
+	        }
+	      }
+	    });
+
+	    this._favoriteProgram.on('update', this._boundOnFavoriteUpdate);
+	    this._favoritePersonality.on('update', this._boundOnFavoritePersonalityUpdate);
+	    this._listenHistory.on('update', this._boundOnListenHistoryUpdate);
+	  }
+	  /**
+	   * @type {Player}
+	   */
+
+
+	  showOnly(ids) {
+	    this._$itemList.each((index, item) => {
+	      const $item = (0, _jquery2.default)(item);
+	      const id = $item.attr('id');
+	      if (ids.includes(id)) {
+	        this._showItem($item);
+	      } else {
+	        this._hideItem($item);
+	      }
+	    });
+	  }
+
+	  showOnlyByPersonality(castNames) {
+	    this._$itemList.each((index, item) => {
+	      const $item = (0, _jquery2.default)(item);
+	      const personalityText = $item.find('.navigator span').text();
+	      const includesFavoritePersonality = castNames.some(castName => {
+	        return personalityText.indexOf(castName) !== -1;
+	      });
+	      if (includesFavoritePersonality) {
+	        this._showItem($item);
+	      } else {
+	        this._hideItem($item);
+	      }
+	    });
+	  }
+
+	  find(className) {
+	    return this._$itemList.filter((index, item) => {
+	      return (0, _jquery2.default)(item).hasClass(className);
+	    }).map((index, item) => {
+	      return {
+	        id: (0, _jquery2.default)(item).attr('id'),
+	        update: (0, _jquery2.default)(item).attr('data-update')
+	      };
+	    });
+	  }
+
+	  get _$itemList() {
+	    return (0, _jquery2.default)('#movieList').find('.listWrap ul li');
+	  }
+
+	  /**
+	   * パーソナリティの中身の文字列をパースして object 化します。
+	   * personalityText の例 '長縄まりあ / 前川涼子'
+	   *
+	   * @param {string} text
+	   * @returns {object[]}
+	   * @private
+	   */
+	  _parsePersonalityText(text) {
+	    const separator = ' / ';
+	    return text.split(separator).map(castName => {
+	      return {
+	        castName: castName };
+	    });
+	  }
+
+	  _createFavButton(isFavorited) {
+	    const button = (0, _jquery2.default)('<div/>').addClass('listItem').addClass('fav').append((0, _jquery2.default)('<p/>').addClass('itemListFavButton').text(this._getFavoriteButtonText(isFavorited)));
+	    if (isFavorited) {
+	      button.addClass('isFavorited');
+	    }
+	    return button;
+	  }
+
+	  _createListenedLabel() {
+	    const label = (0, _jquery2.default)('<div/>').addClass('listItem').addClass('listenedLabel').append((0, _jquery2.default)('<p/>').addClass('listenedLabelText').text('視聴済'));
+	    return label;
+	  }
+
+	  _showItem($item) {
+	    $item.css({ opacity: 1 });
+	    $item.addClass('active');
+	  }
+
+	  _hideItem($item) {
+	    $item.css({ opacity: 0 });
+	    $item.removeClass('active');
+	  }
+
+	  _onFavoriteUpdate(data) {
+	    this._updateFavorited(data.id, data.isFavorited);
+	  }
+
+	  _updateFavorited(targetId, isFavorited) {
+	    this._$itemList.each((index, item) => {
+	      const $item = (0, _jquery2.default)(item);
+	      const id = $item.attr('id');
+	      if (id === targetId) {
+	        if (isFavorited) {
+	          $item.find('.fav').addClass('isFavorited');
+	        } else {
+	          $item.find('.fav').removeClass('isFavorited');
+	        }
+	        $item.find('.fav .itemListFavButton').text(this._getFavoriteButtonText(isFavorited));
+	        return false; // break each
+	      }
+	    });
+	  }
+
+	  _onListenHistoryUpdate() {
+	    this._updateListened();
+	  }
+
+	  _updateListened() {
+	    this._$itemList.each((index, item) => {
+	      const $item = (0, _jquery2.default)(item);
+	      const id = $item.attr('id');
+	      const update = $item.attr('data-update');
+	      if (this._listenHistory.lastListenDate(id) === update) {
+	        $item.addClass('listened');
+	      } else {
+	        $item.removeClass('listened');
+	      }
+	    });
+	  }
+
+	  _getFavoriteButtonText(isFavorited) {
+	    return isFavorited ? '★お気に入り登録済' : '☆お気に入り登録';
+	  }
+
+	  _onFavoritePersonalityUpdate() {
+	    this._updatePersonalityFavorited();
+	  }
+
+	  _updatePersonalityFavorited() {
+	    this._$itemList.each((index, item) => {
+	      const $item = (0, _jquery2.default)(item);
+	      const $personalityText = $item.find('.navigator span');
+	      $personalityText.find('.itemListCastName').each((index, castNameElement) => {
+	        const $castName = (0, _jquery2.default)(castNameElement);
+	        const castName = $castName.data('castname');
+	        if (this._favoritePersonality.includes(castName)) {
+	          $castName.addClass('isFavorited').attr('title', 'お気に入りを解除する');
+	        } else {
+	          $castName.removeClass('isFavorited').attr('title', 'お気に入りに登録する');
+	        }
+	      });
+	    });
+	  }
+
+	}
+	exports.default = ItemListView;
 
 /***/ }
 /******/ ]);

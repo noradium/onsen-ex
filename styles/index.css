@@ -99,3 +99,35 @@
 #movieList.thumbnail .listWrap ul li .navigator span .itemListCastName:hover {
     text-decoration: none;
 }
+
+#movieList.thumbnail .listWrap ul li .listenedLabel {
+    display: none;
+    width: 37px;
+    height: 22px;
+    position: absolute;
+    left: 3px;
+    top: 107px;
+}
+
+#movieList.thumbnail .listWrap ul li .listenedLabel .listenedLabelText {
+    font-size: 10px;
+    color: white;
+    background-color: #00f;
+    text-align: center;
+    top: 50%;
+    position: absolute;
+    transform: translateY(-50%);
+    padding: 0 1px;
+}
+
+#movieList.thumbnail .listWrap ul li.listened .listenedLabel {
+    display: block;
+}
+
+#movieList.thumbnail .listWrap ul li.listened .iconNew {
+    display: none;
+}
+
+#movieList.thumbnail .listWrap ul li.listened .update {
+    left: 44px;
+}

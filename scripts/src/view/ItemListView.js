@@ -6,19 +6,22 @@ export default class ItemListView {
    */
   _player;
 
-  constructor({player, favoriteProgram, favoritePersonality}) {
+  constructor({player, favoriteProgram, favoritePersonality, listenHistory}) {
     this._player = player;
     this._favoriteProgram = favoriteProgram;
     this._favoritePersonality = favoritePersonality;
+    this._listenHistory = listenHistory;
 
     this._boundOnFavoriteUpdate = this._onFavoriteUpdate.bind(this);
     this._boundOnFavoritePersonalityUpdate = this._onFavoritePersonalityUpdate.bind(this);
+    this._boundOnListenHistoryUpdate = this._onListenHistoryUpdate.bind(this);
 
     this._$itemList.each((index, item) => {
       const $item = $(item);
       const id = $item.attr('id');
       const isFavorited = this._favoriteProgram.includes(id);
       $item.append(this._createFavButton(isFavorited));
+      $item.append(this._createListenedLabel());
 
       const $personalityText = $item.find('.navigator span');
       const personalityText = $personalityText.text();
@@ -43,6 +46,8 @@ export default class ItemListView {
         }
       });
     });
+
+    this._updateListened();
 
     // 多分音泉側で document に useCapture=true のクリックハンドラが登録されているせいで、
     // 普通に登録すると反応してくれない。
@@ -70,6 +75,7 @@ export default class ItemListView {
 
     this._favoriteProgram.on('update', this._boundOnFavoriteUpdate);
     this._favoritePersonality.on('update', this._boundOnFavoritePersonalityUpdate);
+    this._listenHistory.on('update', this._boundOnListenHistoryUpdate);
   }
 
   showOnly(ids) {
@@ -104,7 +110,10 @@ export default class ItemListView {
       return $(item).hasClass(className);
     })
       .map((index, item) => {
-        return $(item).attr('id');
+        return {
+          id: $(item).attr('id'),
+          update: $(item).attr('data-update')
+        };
       });
   }
 
@@ -143,6 +152,17 @@ export default class ItemListView {
     return button;
   }
 
+  _createListenedLabel() {
+    const label = $('<div/>')
+      .addClass('listItem')
+      .addClass('listenedLabel')
+      .append($('<p/>')
+        .addClass('listenedLabelText')
+        .text('視聴済')
+      );
+    return label;
+  }
+
   _showItem($item) {
     $item.css({opacity: 1});
     $item.addClass('active');
@@ -169,6 +189,23 @@ export default class ItemListView {
         }
         $item.find('.fav .itemListFavButton').text(this._getFavoriteButtonText(isFavorited));
         return false; // break each
+      }
+    });
+  }
+
+  _onListenHistoryUpdate() {
+    this._updateListened();
+  }
+
+  _updateListened() {
+    this._$itemList.each((index, item) => {
+      const $item = $(item);
+      const id = $item.attr('id');
+      const update = $item.attr('data-update');
+      if (this._listenHistory.lastListenDate(id) === update) {
+        $item.addClass('listened');
+      } else {
+        $item.removeClass('listened');
       }
     });
   }
