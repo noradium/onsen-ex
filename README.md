@@ -14,11 +14,33 @@ chrome.storage.sync にお気に入り情報を保存するので、アカウン
 * 視聴済み表示
   * 一度でも再生した番組は「視聴済」ラベルを表示
   
-#install
+# install
 [Chrome ウェブストア](https://chrome.google.com/webstore/detail/onsen-ex/hdjhpekfkgdgbngpidplkncmgddijaml?hl=ja&gl=JP)
 
 # build
 ```
-$npm install
-$npm run build
+$ npm install
+$ npm run build
+```
+
+# test
+## 事前準備
+まずテストを動かすページのモックを作ります。http://www.onsen.ag/ のページを以下コマンドでローカルにダウンロードしてきます。
+```bash
+$ npm run generate-mock
+```
+次にビルドされた拡張機能をテストするブラウザで読み込めるようパッケージ化します。
+パッケージ化に private key が必要なので、以下コマンドなどで作成し var 以下においてください。
+```bash
+$ openssl genrsa 1024 > var/private.pem
+```
+以下コマンドで、ビルドされた成果物をパッケージング後、ChromeDriver で拡張機能を読み込めるように base64 文字列に変換し、テストの準備をします。
+コードを書き換えた場合は再度このコマンドを実行する必要があります。
+```bash
+$ npm run prepare-test
+```
+
+## テスト実行
+```
+$ npm test
 ```
