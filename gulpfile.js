@@ -22,11 +22,32 @@ function buildWebpack() {
 }
 
 /**
+ * css をビルドします。
+ * といっても今はコピーするだけ
+ */
+function buildCSS() {
+  return gulp.src('src/styles/*.css')
+    .pipe(gulp.dest('dist/styles'));
+}
+
+/**
  * リリースに必要なファイルだけ release ディレクトリにコピーします
  */
-function releaseCopy() {
+const releaseCopy = gulp.parallel([
+  releaseCopyJSCSS, releaseCopyManifest
+]);
+
+function releaseCopyJSCSS() {
   return gulp.src(
-    ['scripts/dist/onsen-ex.js', 'styles/index.css', 'manifest.json'],
+    ['dist/scripts/onsen-ex.js', 'dist/styles/index.css'],
+    { base: './dist' }
+  )
+    .pipe(gulp.dest('release'));
+}
+
+function releaseCopyManifest() {
+  return gulp.src(
+    ['manifest.json'],
     { base: './' }
   )
     .pipe(gulp.dest('release'));
@@ -156,7 +177,7 @@ function prepareTest(done) {
 }
 
 const build = gulp.series(
-  buildWebpack,
+  gulp.parallel([buildWebpack, buildCSS]),
   releaseCopy
 );
 

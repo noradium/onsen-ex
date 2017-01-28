@@ -1,8 +1,8 @@
 module.exports = {
-  context: __dirname + '/scripts',
-  entry: './src/index.js',
+  context: __dirname + '/src/scripts',
+  entry: './index.js',
   output: {
-    path: __dirname + '/scripts/dist',
+    path: __dirname + '/dist/scripts',
     filename: 'onsen-ex.js'
   },
   module: {

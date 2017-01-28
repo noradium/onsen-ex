@@ -1,5 +1,5 @@
 # app
-scripts/dist
+dist
 release
 var/*
 selenium-debug.log
