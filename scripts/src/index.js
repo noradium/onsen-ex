@@ -19,7 +19,7 @@ Promise.all([
   const infoTextView = new InfoTextView({player, favoriteProgram, favoritePersonality});
   const categoryListView = new CategoryListView();
   const itemListView = new ItemListView({player, favoriteProgram, favoritePersonality, listenHistory});
-
+  console.log('init');
   categoryListView.on('click', (data) => {
     switch (data.target) {
       case 'favoriteProgram':
