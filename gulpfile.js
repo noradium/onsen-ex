@@ -15,7 +15,7 @@ const rimraf = require('rimraf');
  * js をビルドします
  */
 function buildWebpack() {
-  const src = path.resolve(webpackConfig.context, webpackConfig.entry);
+  const src = path.resolve(webpackConfig.context, webpackConfig.entry['onsen-ex']);
   return gulp.src(src)
     .pipe(webpack(webpackConfig))
     .pipe(gulp.dest(webpackConfig.output.path));
@@ -39,7 +39,7 @@ const releaseCopy = gulp.parallel([
 
 function releaseCopyJSCSS() {
   return gulp.src(
-    ['dist/scripts/onsen-ex.js', 'dist/styles/index.css'],
+    ['dist/scripts/*.js', 'dist/styles/*.css'],
     { base: './dist' }
   )
     .pipe(gulp.dest('release'));

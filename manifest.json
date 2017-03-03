@@ -17,5 +17,8 @@
   ],
   "permissions": [
     "storage"
+  ],
+  "web_accessible_resources": [
+    "scripts/html5ize.js"
   ]
 }

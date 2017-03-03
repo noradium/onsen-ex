@@ -14,7 +14,8 @@ const listenHistory = new ListenHistory();
 Promise.all([
   favoriteProgram.load(),
   favoritePersonality.load(),
-  listenHistory.load()
+  listenHistory.load(),
+  html5ize()
 ]).then(() => {
   const infoTextView = new InfoTextView({player, favoriteProgram, favoritePersonality});
   const categoryListView = new CategoryListView();
@@ -40,3 +41,12 @@ Promise.all([
     listenHistory.update(playing.id, playing.update);
   });
 });
+
+function html5ize() {
+  return new Promise((resolve) => {
+    const scriptElement = document.createElement('script');
+    scriptElement.setAttribute('src', chrome.extension.getURL('scripts/html5ize.js'));
+    document.documentElement.appendChild(scriptElement);
+    resolve();
+  });
+}
