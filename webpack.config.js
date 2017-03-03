@@ -1,9 +1,13 @@
 module.exports = {
   context: __dirname + '/src/scripts',
-  entry: './index.js',
+  entry: {
+    'onsen-ex': './index.js',
+    'html5ize': './html5ize.js'
+  },
   output: {
     path: __dirname + '/dist/scripts',
-    filename: 'onsen-ex.js'
+    filename: "[name].js",
+    chunkFilename: "[id].js"
   },
   module: {
     loaders: [
