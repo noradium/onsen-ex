@@ -1,6 +1,5 @@
 # onsen-ex
-[音泉](http://www.onsen.ag)にお気に入り機能を追加する Chrome 拡張です。
-chrome.storage.sync にお気に入り情報を保存するので、アカウントが同期されている chrome 間でお気に入り情報が共有されます。
+[音泉](http://www.onsen.ag)に便利機能を追加する Chrome 拡張です。
 
 # features
 * 番組お気に入り
@@ -13,7 +12,9 @@ chrome.storage.sync にお気に入り情報を保存するので、アカウン
   * 左のカテゴリ欄にお気に入り声優タブを追加
 * 視聴済み表示
   * 一度でも再生した番組は「視聴済」ラベルを表示
-  
+* Flash 無効状態でも HTMLVideoElement で再生
+  * 再生に失敗すると自動で Flash にフォールバックします
+
 # install
 [Chrome ウェブストア](https://chrome.google.com/webstore/detail/onsen-ex/hdjhpekfkgdgbngpidplkncmgddijaml?hl=ja&gl=JP)
 
