@@ -2,23 +2,21 @@
 (() => {
   _movieID = 'html5Player';
 
+  const _thisMovie = window.thisMovie;
   function thisMovie(movieID) {
     if (movieID === 'html5Player') {
       return _html5Player;
     }
-
-    if (navigator.appName.indexOf("Microsoft") != -1) {
-      return window[movieID];
-    } else {
-      return document[movieID];
-    }
+    return _thisMovie(movieID);
   }
+  window.thisMovie = thisMovie;
 
   const _setMovie = window.setMovie;
   function setMovie(id) {
     _usePlayer('html5Player');
     _setMovie(id);
   }
+  window.setMovie = setMovie;
 
   function _usePlayer(playerId) {
     if (window._movieID === playerId) {
@@ -54,7 +52,6 @@
       document.querySelector('#movieWrap .playerWrap').classList.remove('mainPlayer');
     }
   }
-
 
   class HTML5Player {
     _video;
@@ -117,6 +114,4 @@
 
   const _html5Player = new HTML5Player();
 
-  window.thisMovie = thisMovie;
-  window.setMovie = setMovie;
 })();
