@@ -1,3 +1,7 @@
+import LocalStorage from './storage/LocalStorage';
+
+const VOLUME_STORAGE_KEY = 'html5Player_volume';
+const DEFAULT_VOLUME = 0.5;
 
 (() => {
   _movieID = 'html5Player';
@@ -73,6 +77,9 @@
       document.querySelector('#movieWrap .playerWrap').classList.add('html5Player');
 
       video.addEventListener('error', this._onVideoError.bind(this));
+      video.addEventListener('volumechange', (event) => {
+        LocalStorage.set(VOLUME_STORAGE_KEY, video.volume);
+      });
     }
 
     pause() {
@@ -98,6 +105,7 @@
     playMovie(movie) {
       this._video.src = movie.moviePath;
       this._video.poster = movie.thumbnailPath;
+      this._video.volume = LocalStorage.get(VOLUME_STORAGE_KEY) || DEFAULT_VOLUME;
       this._video.play();
     }
 
