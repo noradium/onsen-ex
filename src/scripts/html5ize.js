@@ -1,4 +1,5 @@
 import LocalStorage from './storage/LocalStorage';
+import videojs from 'video.js';
 
 const VOLUME_STORAGE_KEY = 'html5Player_volume';
 const DEFAULT_VOLUME = 0.5;
@@ -67,18 +68,20 @@ const DEFAULT_VOLUME = 0.5;
     _resetPlayer() {
       const video = document.createElement('video');
       video.setAttribute('id', 'html5Player');
+      video.classList.add('video-js');
+      video.classList.add('vjs-default-skin');
       video.setAttribute('width', '450');
-      video.setAttribute('height', '300');
+      video.setAttribute('height', '253');
       video.setAttribute('controls', '');
       const playerWrap = document.querySelector('#movieWrap .playerWrap');
       playerWrap.appendChild(video);
-      this._video = video;
+      this._video = videojs('html5Player');
 
       document.querySelector('#movieWrap .playerWrap').classList.add('html5Player');
 
-      video.addEventListener('error', this._onVideoError.bind(this));
-      video.addEventListener('volumechange', (event) => {
-        LocalStorage.set(VOLUME_STORAGE_KEY, video.volume);
+      this._video.on('error', this._onVideoError.bind(this));
+      this._video.on('volumechange', (event) => {
+        LocalStorage.set(VOLUME_STORAGE_KEY, this._video.volume());
       });
     }
 
@@ -103,9 +106,9 @@ const DEFAULT_VOLUME = 0.5;
      * @param {string} movie.type
      */
     playMovie(movie) {
-      this._video.src = movie.moviePath;
-      this._video.poster = movie.thumbnailPath;
-      this._video.volume = LocalStorage.get(VOLUME_STORAGE_KEY) || DEFAULT_VOLUME;
+      this._video.src(movie.moviePath);
+      this._video.poster(movie.thumbnailPath);
+      this._video.volume(LocalStorage.get(VOLUME_STORAGE_KEY) || DEFAULT_VOLUME);
       this._video.play();
     }
 
