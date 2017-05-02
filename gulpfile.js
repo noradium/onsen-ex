@@ -10,6 +10,8 @@ const jsonfile = require('jsonfile');
 const fs = require('fs');
 const scrape = require('website-scraper');
 const rimraf = require('rimraf');
+const rework = require('gulp-rework');
+const reworkNPM = require('rework-npm');
 
 /**
  * js をビルドします
@@ -27,6 +29,7 @@ function buildWebpack() {
  */
 function buildCSS() {
   return gulp.src('src/styles/*.css')
+    .pipe(rework(reworkNPM()))
     .pipe(gulp.dest('dist/styles'));
 }
 
