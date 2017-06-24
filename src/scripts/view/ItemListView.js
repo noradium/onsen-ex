@@ -94,8 +94,10 @@ export default class ItemListView {
     this._$itemList.each((index, item) => {
       const $item = $(item);
       const personalityText = $item.find('.navigator span').text();
+      const guestText = $item.data('guest');
       const includesFavoritePersonality = castNames.some((castName) => {
-        return personalityText.indexOf(castName) !== -1;
+        return personalityText.indexOf(castName) !== -1 ||
+          (guestText && guestText.indexOf(castName) !== -1);
       });
       if (includesFavoritePersonality) {
         this._showItem($item);
